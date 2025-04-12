@@ -89,6 +89,10 @@ class ChatbotController extends Controller
     {
         try {
             $userMessage = $request->input('message');
+
+            if (empty(trim($userMessage))) {
+                return response()->json(['reply' => 'Mesajul este gol. Încearcă din nou.']);
+            }
             $apiKey = env('GEMINI_API_KEY');
 
             // Get or create conversation for authenticated users
@@ -137,6 +141,9 @@ class ChatbotController extends Controller
                 $contents = array_merge($contents, $messageHistory);
             } else {
                 // If no history, just add the current message
+                if (empty(trim($userMessage))) {
+                    return response()->json(['reply' => 'Mesajul este gol. Încearcă din nou.']);
+                }
                 $contents[] = [
                     'role' => 'user',
                     'parts' => [['text' => $userMessage]]

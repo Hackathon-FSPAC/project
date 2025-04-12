@@ -27,7 +27,7 @@
         {{-- FORMULAR POSTARE --}}
         <div class="max-w-2xl mx-auto">
             <div class="bg-white shadow rounded-xl p-5 mb-6 flex space-x-4">
-                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}" class="w-12 h-12 rounded-full">
+                <img src="{{ Auth::user()->profile_photo_url }}" class="w-12 h-12 rounded-full">
                 <form method="POST" action="{{ route('feed.post') }}" enctype="multipart/form-data" class="flex-1">
                     @csrf
                     <textarea name="content" rows="2" placeholder="What's on your mind?" class="w-full p-3 border border-gray-300 rounded-xl mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
@@ -45,7 +45,7 @@
             @foreach ($feed as $item)
             <div class="bg-white rounded-xl shadow p-5 mb-5">
                 <div class="flex items-center space-x-3 mb-2">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode($item->user->name) }}" class="w-8 h-8 rounded-full">
+                    <img src="{{ $item->user->profile_photo ? asset('storage/' . $item->user->profile_photo) : 'https://ui-avatars.com/api/?name=' . urlencode($item->user->name) }}" class="w-8 h-8 rounded-full">
                     <div class="text-sm text-gray-700 font-semibold">
                         {{ $item->user->name }}
                         <span class="text-gray-400 font-normal text-xs">· {{ $item->created_at->diffForHumans() }}</span>

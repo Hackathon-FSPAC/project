@@ -17,23 +17,60 @@
             selectedAnswer: null,
             score: 0,
             showAnswer: false,
-            questions: [
-                {
-                    text: "Ce este un buget personal?",
-                    options: ["Plan pentru cheltuieli și venituri", "Card de credit", "Cont de economii", "Împrumut bancar"],
-                    correct: 0,
-                },
-                {
-                    text: "Este bine să economisești lunar un procent fix din venituri?",
-                    options: ["Da", "Nu"],
-                    correct: 0,
-                },
-                {
-                    text: "Un card de credit este același lucru cu un card de debit.",
-                    options: ["Adevărat", "Fals"],
-                    correct: 1,
+            questions: [],
+            loading: true,
+
+            init() {
+                this.loadQuestionsFromAI();
+            },
+
+            loadQuestionsFromAI() {
+                fetch('/chatbot/talk', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        message: `Generează 10 întrebări de educație financiară în limba română, în format JSON strict cu următoarea structură:
+
+{
+  "questions": [
+    {
+      "text": "Întrebarea...",
+      "options": ["Varianta A", "Varianta B", "Varianta C", "Varianta D"],
+      "correct": 0
+    }
+  ]
+}
+
+Răspunsurile trebuie să fie clare, educative, relevante pentru tineri (16-25 ani), și să acopere teme precum: buget, economisire, credite, carduri, scor de credit, investiții, dobândă, salarii, cheltuieli. Nu include explicații.`
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                try {
+                    // Extrage doar partea dintre { și } pentru a forța parsarea
+                    const jsonString = data.reply.match(/{[\s\S]*}/)?.[0];
+
+                    if (!jsonString) {
+                        throw new Error("JSON nu a fost găsit în răspunsul Gemini.");
+                    }
+
+                    const parsed = JSON.parse(jsonString);
+                    this.questions = parsed.questions;
+                    this.loading = false;
+                } catch (err) {
+                    console.error("❌ Eroare la parsare JSON:", err);
+                    alert('Nu am putut încărca întrebările generate de AI.');
                 }
-            ],
+            })
+                .catch(err => {
+                    console.error("❌ Eroare rețea:", err);
+                    alert('Eroare la conectarea cu AI-ul.');
+                });
+            },
+
             selectAnswer(index) {
                 this.selectedAnswer = index;
                 this.showAnswer = true;
@@ -41,16 +78,19 @@
                     this.score++;
                 }
             },
+
             nextQuestion() {
                 this.currentQuestion++;
                 this.selectedAnswer = null;
                 this.showAnswer = false;
             },
+
             getFeedback() {
                 if (this.score <= 4) return "🟡 Nivel de bază – mai ai de învățat!";
                 if (this.score <= 7) return "🟠 Nivel mediu – ești pe drumul cel bun!";
                 return "🟢 Nivel avansat – bravo!";
             },
+
             shareToFeed() {
                 fetch('/quiz/share', {
                     method: 'POST',
@@ -58,24 +98,21 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     },
-                    body: JSON.stringify({
-                        score: this.score
-                    }),
+                    body: JSON.stringify({ score: this.score })
                 })
                 .then(res => res.json())
-                .then(data => {
+                .then(() => {
                     alert('✅ Scorul tău a fost partajat pe feed!');
+                    window.location.href = '/dashboard'; // redirect automat
                 })
                 .catch(err => {
                     console.error(err);
                     alert('Eroare la partajare.');
-                })
-                .then(data => {
-                    window.location.href = '/dashboard';
                 });
             }
         }
     }
-    </script>
+</script>
+
 <script src="https://unpkg.com/alpinejs" defer></script>
 </html>

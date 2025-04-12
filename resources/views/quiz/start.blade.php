@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div x-data="quizApp()" class="max-w-2xl mx-auto py-10 px-4">
+<div x-data="quizApp()" x-init="init()" class="max-w-2xl mx-auto py-10 px-4">
 
     {{-- Întrebări --}}
     <template x-if="currentQuestion < questions.length">
