@@ -6,6 +6,7 @@ use App\Http\Controllers\FeedController;
 use App\Models\FeedItem;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\QuizController;
+use App\Http\Controllers\ChatbotController;
 
 Route::get('/', function () {
     $feed = FeedItem::with('user')->latest()->get();
@@ -32,6 +33,13 @@ Route::middleware(['auth'])->prefix('dashboard')->group(function () {
     })->name('dashboard.quiz');
 });
 
+
+Route::get('/chatbot', [ChatbotController::class, 'show']);
+Route::post('/chatbot/talk', [ChatbotController::class, 'talk']);
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/chatbot/clear', [ChatbotController::class, 'clearHistory'])->name('chatbot.clear');
+});
 
 
 Route::middleware(['auth'])->group(function () {

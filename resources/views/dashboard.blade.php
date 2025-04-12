@@ -68,5 +68,9 @@
             @endforeach
         </div>
     </div>
+    <a href="{{ url('/chatbot') }}"
+       class="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-5 rounded-full shadow-lg transition duration-300 z-50">
+        💬 Chat with AI
+    </a>
 </div>
 @endsection
