@@ -16,28 +16,16 @@
         </div>
     </template>
 
-    <template x-if="currentQuestion >= questions.length">
-        <div class="text-center space-y-4">
-            <h3 class="text-xl font-bold">🎉 Ai terminat quiz-ul!</h3>
-            <p class="mt-2 text-lg">Scorul tău: <span x-text="score"></span>/10</p>
-            <p class="mt-2 font-semibold" x-text="getFeedback()"></p>
-            <a :href="generateShareLink()" class="inline-block underline text-blue-600" target="_blank">
-                📤 Partajează-ți scorul
-            </a>
+    <div x-show="currentQuestion >= questions.length" class="text-center mt-6">
+        <h2 class="text-2xl font-bold">✅ Scor final: <span x-text="score"></span>/10</h2>
+        <p class="mt-2 text-gray-600" x-text="getFeedback()"></p>
     
-            <div class="flex justify-center gap-4 mt-6">
-                <!-- Buton refă testul -->
-                <button @click="restartQuiz()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                    🔁 Refă testul
-                </button>
-    
-                <!-- Buton înapoi la dashboard -->
-                <a href="{{ route('dashboard') }}" class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">
-                    🏠 Înapoi la dashboard
-                </a>
-            </div>
-        </div>
-    </template>
+        <button
+            @click="shareToFeed()"
+            class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+            📤 Partajează scorul pe feed
+        </button>
+    </div>
     
 
     <div class="text-right">

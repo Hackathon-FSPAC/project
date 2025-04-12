@@ -73,7 +73,7 @@ class ProfileController extends Controller
             'profile_photo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        $path = $request->file('profile_photo')->store('profile_photos', 'public');
+        $path = $request->file('image')->store('feed_images', 'public');
 
         $user = $request->user();
         $user->profile_photo = $path;

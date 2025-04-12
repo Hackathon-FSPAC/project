@@ -9,7 +9,7 @@
             <h2 class="text-lg font-bold mb-4">📂 Sections</h2>
             <ul class="space-y-2 text-base">
                 <li><a href="{{ route('dashboard') }}" class="text-blue-600 hover:underline">📊 Feed</a></li>
-                <li><a href="{{ route('dashboard.quiz') }}" class="text-blue-600 hover:underline">🧠 Daily Financial Quiz</a></li>
+                <li><a href="{{ route('quiz.show') }}" class="text-blue-600 hover:underline">🧠 Daily Financial Quiz</a></li>
                 <li><a href="{{ route('profile') }}" class="text-blue-600 hover:underline">👤 Profile</a></li>
                 <li><a href="#" class="text-blue-600 hover:underline">⚙️ Settings</a></li>
             </ul>

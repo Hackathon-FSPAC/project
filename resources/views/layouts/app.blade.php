@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ro">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <head>
     <meta charset="UTF-8">
     <title>{{ config('app.name', 'Laravel') }}</title>
@@ -31,41 +32,6 @@
                     text: "Un card de credit este același lucru cu un card de debit.",
                     options: ["Adevărat", "Fals"],
                     correct: 1,
-                },
-                {
-                    text: "Ce înseamnă dobânda compusă?",
-                    options: ["Dobândă doar pe suma inițială", "Dobândă și pe dobândă acumulată"],
-                    correct: 1,
-                },
-                {
-                    text: "Ce reprezintă scorul de credit?",
-                    options: ["Vârsta ta", "Nivelul tău de educație", "Fiabilitatea ta de plată"],
-                    correct: 2,
-                },
-                {
-                    text: "Care este o regulă de bază în economisire?",
-                    options: ["Cheltuie tot", "Plătește-te pe tine primul"],
-                    correct: 1,
-                },
-                {
-                    text: "O rată fixă înseamnă că...",
-                    options: ["Dobânda poate varia", "Plătești aceeași sumă lunar"],
-                    correct: 1,
-                },
-                {
-                    text: "Un fond de urgență ar trebui să acopere...",
-                    options: ["0 luni", "1 lună", "3–6 luni de cheltuieli"],
-                    correct: 2,
-                },
-                {
-                    text: "Ce e inflația?",
-                    options: ["Scăderea prețurilor", "Creșterea valorii banilor", "Creșterea prețurilor"],
-                    correct: 2,
-                },
-                {
-                    text: "Este bine să ai un singur venit?",
-                    options: ["Da", "Nu, diversificarea e importantă"],
-                    correct: 1,
                 }
             ],
             selectAnswer(index) {
@@ -85,9 +51,28 @@
                 if (this.score <= 7) return "🟠 Nivel mediu – ești pe drumul cel bun!";
                 return "🟢 Nivel avansat – bravo!";
             },
-            generateShareLink() {
-                const text = `Am obținut ${this.score}/10 la quiz-ul de educație financiară! 🧠💸 Tu cât știi? https://finmate.hackathon.aico.dev`;
-                return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+            shareToFeed() {
+                fetch('/quiz/share', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: JSON.stringify({
+                        score: this.score
+                    }),
+                })
+                .then(res => res.json())
+                .then(data => {
+                    alert('✅ Scorul tău a fost partajat pe feed!');
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Eroare la partajare.');
+                })
+                .then(data => {
+                    window.location.href = '/dashboard';
+                });
             }
         }
     }

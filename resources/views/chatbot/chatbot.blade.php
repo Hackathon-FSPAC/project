@@ -1,53 +1,4 @@
-{{--<!DOCTYPE html>--}}
-{{--<html lang="en">--}}
-{{--<head>--}}
-{{--    <meta charset="UTF-8">--}}
-{{--    <title>Simple AI Chatbot</title>--}}
-{{--    <style>--}}
-{{--        body { font-family: sans-serif; padding: 2rem; max-width: 600px; margin: auto; }--}}
-{{--        input, button { padding: 10px; margin-top: 10px; width: 100%; }--}}
-{{--        #chat-box { margin-top: 20px; background: #f1f1f1; padding: 10px; border-radius: 5px; }--}}
-{{--    </style>--}}
-{{--</head>--}}
-{{--<body>--}}
-{{--<h2>Chat with AI (Gemini)</h2>--}}
-
-{{--<form id="chat-form">--}}
-{{--    <input type="text" id="message" placeholder="Type your message..." required />--}}
-{{--    <button type="submit">Send</button>--}}
-{{--</form>--}}
-
-{{--<div id="chat-box"></div>--}}
-
-{{--<script>--}}
-{{--    const form = document.getElementById('chat-form');--}}
-{{--    const messageInput = document.getElementById('message');--}}
-{{--    const chatBox = document.getElementById('chat-box');--}}
-
-{{--    form.addEventListener('submit', async (e) => {--}}
-{{--        e.preventDefault();--}}
-{{--        const msg = messageInput.value;--}}
-{{--        chatBox.innerHTML += `<p><strong>You:</strong> ${msg}</p>`;--}}
-{{--        messageInput.value = '';--}}
-
-{{--        const res = await fetch('/chatbot/talk', {--}}
-{{--            method: 'POST',--}}
-{{--            headers: {--}}
-{{--                'Content-Type': 'application/json',--}}
-{{--                'X-CSRF-TOKEN': '{{ csrf_token() }}'--}}
-{{--            },--}}
-{{--            body: JSON.stringify({ message: msg })--}}
-{{--        });--}}
-
-{{--        const data = await res.json();--}}
-{{--        chatBox.innerHTML += `<p><strong>AI:</strong> ${data.reply}</p>`;--}}
-{{--    });--}}
-{{--</script>--}}
-{{--</body>--}}
-{{--</html>--}}
-
-
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -99,7 +50,15 @@
     </style>
 </head>
 <body>
-<h2>Financial AI Assistant</h2>
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+    <a href="{{ route('dashboard') }}"
+       style="background: #2563eb; color: white; padding: 8px 16px; border-radius: 5px; text-decoration: none; font-weight: bold;">
+        ⬅ Înapoi la Dashboard
+    </a>
+    <h2 style="margin: 0; font-size: 1.5rem; font-weight: bold; color: #1e293b;">
+        Financial AI Assistant
+    </h2>
+</div>
 
 @auth
     <p>Welcome back! Your conversation history is being saved.</p>

@@ -28,9 +28,7 @@ Route::middleware(['auth'])->prefix('dashboard')->group(function () {
         return view('dashboard');
     })->name('dashboard');
 
-    Route::get('/quiz', function () {
-        return view('dashboard.quiz');
-    })->name('dashboard.quiz');
+    Route::get('/quiz', [QuizController::class, 'show'])->name('quiz.show');
 });
 
 
@@ -59,5 +57,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/quiz', [QuizController::class, 'show'])->name('quiz.show');
     Route::post('/quiz/submit', [QuizController::class, 'submit'])->name('quiz.submit');
 });
+
+Route::post('/quiz/share', function (\Illuminate\Http\Request $request) {
+    \App\Models\FeedItem::create([
+        'user_id' => auth()->id(),
+        'content' => '📊 Am obținut ' . $request->score . '/10 la quiz-ul de educație financiară! 🧠💸 Tu cât știi?',
+        'type' => 'quiz_result',
+    ]);
+
+    return response()->json(['status' => 'ok']);
+})->middleware('auth');
 
 require __DIR__.'/auth.php';

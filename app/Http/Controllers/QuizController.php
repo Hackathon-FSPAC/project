@@ -1,27 +1,30 @@
+<?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\QuizResult;
+use App\Models\FeedItem;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class QuizController extends Controller
 {
     public function show()
-    {
-        $user = Auth::user();
-        $today = Carbon::today();
+{
+    $today = \Carbon\Carbon::today();
+    $user = \Auth::user();
 
-        $existing = QuizResult::where('user_id', $user->id)
-                    ->whereDate('completed_at', $today)
-                    ->first();
+    $already = \App\Models\QuizResult::where('user_id', $user->id)
+        ->whereDate('completed_at', $today)
+        ->first();
 
-        if ($existing) {
-            return view('quiz.already_done', ['score' => $existing->score]);
-        }
-
-        return view('quiz.start'); // pagina cu întrebări
+    if ($already) {
+        return view('quiz.already_done', ['score' => $already->score]);
     }
+
+    return view('quiz.start');
+}
 
     public function submit(Request $request)
 {
@@ -46,6 +49,12 @@ class QuizController extends Controller
         'user_id' => $userId,
         'score' => $request->score,
         'completed_at' => now(),
+    ]);
+
+    FeedItem::create([
+    'user_id' => Auth::id(),
+    'content' => '📊 Tocmai am completat quiz-ul financiar și am obținut scorul de ' . $request->score . '/10!',
+    'type' => 'quiz_result', // opțional: să știi că e o postare automată
     ]);
 
     return redirect()->route('quiz.show');
