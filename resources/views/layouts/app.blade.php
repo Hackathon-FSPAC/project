@@ -1,36 +1,96 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
-
-        <title>{{ config('app.name', 'Laravel') }}</title>
-
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
-
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
-
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
-        </div>
-    </body>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ config('app.name', 'Laravel') }}</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+@stack('scripts')
+<body class="antialiased text-gray-900">
+    @yield('content')
+</body>
+<script>
+    function quizApp() {
+        return {
+            currentQuestion: 0,
+            selectedAnswer: null,
+            score: 0,
+            showAnswer: false,
+            questions: [
+                {
+                    text: "Ce este un buget personal?",
+                    options: ["Plan pentru cheltuieli și venituri", "Card de credit", "Cont de economii", "Împrumut bancar"],
+                    correct: 0,
+                },
+                {
+                    text: "Este bine să economisești lunar un procent fix din venituri?",
+                    options: ["Da", "Nu"],
+                    correct: 0,
+                },
+                {
+                    text: "Un card de credit este același lucru cu un card de debit.",
+                    options: ["Adevărat", "Fals"],
+                    correct: 1,
+                },
+                {
+                    text: "Ce înseamnă dobânda compusă?",
+                    options: ["Dobândă doar pe suma inițială", "Dobândă și pe dobândă acumulată"],
+                    correct: 1,
+                },
+                {
+                    text: "Ce reprezintă scorul de credit?",
+                    options: ["Vârsta ta", "Nivelul tău de educație", "Fiabilitatea ta de plată"],
+                    correct: 2,
+                },
+                {
+                    text: "Care este o regulă de bază în economisire?",
+                    options: ["Cheltuie tot", "Plătește-te pe tine primul"],
+                    correct: 1,
+                },
+                {
+                    text: "O rată fixă înseamnă că...",
+                    options: ["Dobânda poate varia", "Plătești aceeași sumă lunar"],
+                    correct: 1,
+                },
+                {
+                    text: "Un fond de urgență ar trebui să acopere...",
+                    options: ["0 luni", "1 lună", "3–6 luni de cheltuieli"],
+                    correct: 2,
+                },
+                {
+                    text: "Ce e inflația?",
+                    options: ["Scăderea prețurilor", "Creșterea valorii banilor", "Creșterea prețurilor"],
+                    correct: 2,
+                },
+                {
+                    text: "Este bine să ai un singur venit?",
+                    options: ["Da", "Nu, diversificarea e importantă"],
+                    correct: 1,
+                }
+            ],
+            selectAnswer(index) {
+                this.selectedAnswer = index;
+                this.showAnswer = true;
+                if (index === this.questions[this.currentQuestion].correct) {
+                    this.score++;
+                }
+            },
+            nextQuestion() {
+                this.currentQuestion++;
+                this.selectedAnswer = null;
+                this.showAnswer = false;
+            },
+            getFeedback() {
+                if (this.score <= 4) return "🟡 Nivel de bază – mai ai de învățat!";
+                if (this.score <= 7) return "🟠 Nivel mediu – ești pe drumul cel bun!";
+                return "🟢 Nivel avansat – bravo!";
+            },
+            generateShareLink() {
+                const text = `Am obținut ${this.score}/10 la quiz-ul de educație financiară! 🧠💸 Tu cât știi? https://finmate.hackathon.aico.dev`;
+                return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+            }
+        }
+    }
+    </script>
+<script src="https://unpkg.com/alpinejs" defer></script>
 </html>
