@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Models\FeedItem;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -56,5 +58,27 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function index(): View
+    {
+        $user = Auth::user();
+        $posts = FeedItem::where('user_id', $user->id)->latest()->get();
+        return view('profile.index', compact('user', 'posts'));
+    }
+
+    public function updatePhoto(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'profile_photo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $path = $request->file('profile_photo')->store('profile_photos', 'public');
+
+        $user = $request->user();
+        $user->profile_photo = $path;
+        $user->save();
+
+        return Redirect::route('profile')->with('success', 'Poza de profil a fost actualizată.');
     }
 }
