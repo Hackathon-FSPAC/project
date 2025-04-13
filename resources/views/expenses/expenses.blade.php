@@ -19,8 +19,19 @@
         </div>
         <div>
             <label class="block text-sm font-medium mb-1 text-gray-700">📂 Categorie</label>
-            <input type="text" name="category" class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            <select name="category" class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                <option value="" disabled selected>Alege o categorie</option>
+                <option value="Food">🍔 Food</option>
+                <option value="Rent">🏠 Rent</option>
+                <option value="Entertainment">🎮 Entertainment</option>
+                <option value="Utilities">💡 Utilities</option>
+                <option value="Transport">🚗 Transport</option>
+                <option value="Health">🩺 Health</option>
+                <option value="Education">📚 Education</option>
+                <option value="Others">🔧 Others</option>
+            </select>
         </div>
+        
         <div>
             <label class="block text-sm font-medium mb-1 text-gray-700">💸 Suma (pozitiv = venit, negativ = cheltuială)</label>
             <input type="number" step="0.01" name="amount" class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
