@@ -97,4 +97,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/expenses/{id}', [ExpenseController::class, 'update'])->name('expenses.update');
     Route::delete('/expenses/{id}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
 });
+
+Route::post('/expenses/import', [App\Http\Controllers\ExpenseController::class, 'importMock'])->name('expenses.import.mock');
+
+
 require __DIR__.'/auth.php';

@@ -5,12 +5,22 @@
 
     <h2 class="text-2xl font-bold mb-6">📒 Expense Tracker</h2>
 
+    {{-- Mesaj de succes --}}
     @if(session('success'))
         <div class="bg-green-100 text-green-800 border border-green-300 p-4 rounded-xl mb-6 shadow">
             {{ session('success') }}
         </div>
     @endif
 
+    {{-- BUTON DE IMPORT MOCK --}}
+    <form method="POST" action="{{ route('expenses.import.mock') }}" class="mb-6">
+        @csrf
+        <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition shadow">
+            🔄 Importă tranzacții simulate
+        </button>
+    </form>
+
+    {{-- FORMULAR MANUAL --}}
     <form method="POST" action="{{ route('expenses.store') }}" class="bg-white shadow rounded-xl p-6 space-y-4">
         @csrf
         <div>
@@ -31,7 +41,6 @@
                 <option value="Others">🔧 Others</option>
             </select>
         </div>
-        
         <div>
             <label class="block text-sm font-medium mb-1 text-gray-700">💸 Suma (pozitiv = venit, negativ = cheltuială)</label>
             <input type="number" step="0.01" name="amount" class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
