@@ -80,5 +80,11 @@ Route::post('/quiz/generate', [ChatbotController::class, 'generateQuizQuestions'
 Route::post('/chatbot/analyze-quiz', [\App\Http\Controllers\ChatbotController::class, 'analyzeQuiz'])
     ->middleware('auth');
 
-
+// Replace the existing logout route with this:
+Route::post('/logout', function (Request $request) {
+    Auth::guard('web')->logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return redirect('/');
+})->name('logout');
 require __DIR__.'/auth.php';
