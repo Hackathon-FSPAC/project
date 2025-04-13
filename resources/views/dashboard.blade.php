@@ -21,7 +21,6 @@
                 <li><a href="{{ route('quiz.show') }}" class="text-blue-600 hover:underline">🧠 Daily Financial Quiz</a></li>
                 <li><a href="{{ route('profile') }}" class="text-blue-600 hover:underline">👤 Profile</a></li>
                 <li><a href="{{ route('expenses.expenses') }}" class="text-blue-600 hover:underline">💸 Your Expenses</a></li>
-                <li><a href="#" class="text-blue-600 hover:underline">⚙️ Settings</a></li>
                 <li><a href="{{ route('private-messages.index') }}" class="text-blue-600 hover:underline"><i class="fas fa-envelope"></i>💬 Messages</a></li>
             </ul>
         </div>
