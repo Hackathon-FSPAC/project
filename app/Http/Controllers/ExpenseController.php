@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use App\Models\Expense;
 use Illuminate\Support\Facades\Auth;
@@ -10,12 +9,42 @@ use Illuminate\Support\Facades\Auth;
 
 class ExpenseController extends Controller
 {
+
     public function expenses()
     {
         $expenses = Expense::where('user_id', Auth::id())->latest()->get();
         $total = $expenses->sum('amount');
 
-        return view('expenses.expenses', compact('expenses', 'total'));
+        $chatbotController = new ChatbotController();
+        $analysis = $chatbotController->analyzeExpenses();
+
+        // Ensure categories are Laravel Collections
+        if (isset($analysis['expenseCategories']) && is_array($analysis['expenseCategories'])) {
+            $analysis['expenseCategories'] = collect($analysis['expenseCategories']);
+        }
+
+        if (isset($analysis['incomeCategories']) && is_array($analysis['incomeCategories'])) {
+            $analysis['incomeCategories'] = collect($analysis['incomeCategories']);
+        }
+
+        return view('expenses.expenses', compact('expenses', 'total', 'analysis'));
+    }
+
+    public function insights()
+    {
+        $chatbotController = new ChatbotController();
+        $analysis = $chatbotController->analyzeExpenses();
+
+        // Ensure categories are Laravel Collections
+        if (isset($analysis['expenseCategories']) && is_array($analysis['expenseCategories'])) {
+            $analysis['expenseCategories'] = collect($analysis['expenseCategories']);
+        }
+
+        if (isset($analysis['incomeCategories']) && is_array($analysis['incomeCategories'])) {
+            $analysis['incomeCategories'] = collect($analysis['incomeCategories']);
+        }
+
+        return view('expenses.insights', compact('analysis'));
     }
 
     public function store(Request $request)
@@ -60,30 +89,6 @@ class ExpenseController extends Controller
         $expense->delete();
 
         return redirect()->back()->with('success', 'Expense deleted!');
-    }
-
-    public function importMock()
-    {
-        $userId = auth()->id();
-
-        $mockExpenses = [
-            ['title' => 'Pizza Hut', 'category' => 'Food', 'amount' => -29.99],
-            ['title' => 'Netflix', 'category' => 'Entertainment', 'amount' => -15.99],
-            ['title' => 'Chirie Aprilie', 'category' => 'Rent', 'amount' => -300],
-            ['title' => 'Salariu', 'category' => 'Others', 'amount' => 1500],
-            ['title' => 'Transport Uber', 'category' => 'Transport', 'amount' => -18.5],
-        ];
-
-        foreach ($mockExpenses as $expense) {
-            \App\Models\Expense::create([
-                'user_id' => $userId,
-                'title' => $expense['title'],
-                'category' => $expense['category'],
-                'amount' => $expense['amount'],
-            ]);
-        }
-
-        return redirect()->route('expenses.expenses')->with('success', 'Tranzacțiile simulate au fost adăugate!');
     }
 
 }

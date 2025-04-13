@@ -5,22 +5,22 @@
 
     <h2 class="text-2xl font-bold mb-6">📒 Expense Tracker</h2>
 
-    {{-- Mesaj de succes --}}
+    <div class="flex justify-between items-center mb-6">
+        <div></div> <!-- Empty div for flex spacing -->
+        <a href="{{ route('expenses.insights') }}" class="flex items-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            View Financial Insights
+        </a>
+    </div>
+
     @if(session('success'))
         <div class="bg-green-100 text-green-800 border border-green-300 p-4 rounded-xl mb-6 shadow">
             {{ session('success') }}
         </div>
     @endif
 
-    {{-- BUTON DE IMPORT MOCK --}}
-    <form method="POST" action="{{ route('expenses.import.mock') }}" class="mb-6">
-        @csrf
-        <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition shadow">
-            🔄 Importă tranzacții simulate
-        </button>
-    </form>
-
-    {{-- FORMULAR MANUAL --}}
     <form method="POST" action="{{ route('expenses.store') }}" class="bg-white shadow rounded-xl p-6 space-y-4">
         @csrf
         <div>
@@ -41,6 +41,7 @@
                 <option value="Others">🔧 Others</option>
             </select>
         </div>
+
         <div>
             <label class="block text-sm font-medium mb-1 text-gray-700">💸 Suma (pozitiv = venit, negativ = cheltuială)</label>
             <input type="number" step="0.01" name="amount" class="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" required>

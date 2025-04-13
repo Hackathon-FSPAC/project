@@ -97,7 +97,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/expenses/{id}/edit', [ExpenseController::class, 'edit'])->name('expenses.edit');
     Route::put('/expenses/{id}', [ExpenseController::class, 'update'])->name('expenses.update');
     Route::delete('/expenses/{id}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
+    Route::get('/expenses/insights', [ExpenseController::class, 'insights'])->name('expenses.insights');
 });
+
 Route::get('/private-messages', [PrivateMessageController::class, 'index'])->name('private-messages.index');
 Route::get('/private-messages/{user}', [PrivateMessageController::class, 'show'])
      ->name('private-messages.show');
