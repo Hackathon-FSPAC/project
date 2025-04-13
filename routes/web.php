@@ -7,6 +7,7 @@ use App\Models\FeedItem;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\ChatbotController;
+use Illuminate\Http\Request;
 
 Route::get('/', function () {
     $feed = FeedItem::with('user')->latest()->get();
@@ -58,17 +59,26 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/quiz/submit', [QuizController::class, 'submit'])->name('quiz.submit');
 });
 
-Route::post('/quiz/share', function (\Illuminate\Http\Request $request) {
+Route::post('/quiz/share', function (Request $request) {
+    $score = (int) $request->input('score');
+
+    if ($score < 0 || $score > 10) {
+        return response()->json(['error' => 'Scor invalid.'], 422);
+    }
+
     \App\Models\FeedItem::create([
         'user_id' => auth()->id(),
-        'content' => '📊 Am obținut ' . $request->score . '/10 la quiz-ul de educație financiară! 🧠💸 Tu cât știi?',
+        'content' => '📊 Am obținut ' . $score . '/10 la quiz-ul de educație financiară! 🧠💸 Tu cât știi?',
         'type' => 'quiz_result',
     ]);
 
     return response()->json(['status' => 'ok']);
-})->middleware('auth');
+})->middleware('auth'); 
 
 Route::post('/quiz/generate', [ChatbotController::class, 'generateQuizQuestions'])->middleware('auth');
+
+Route::post('/chatbot/analyze-quiz', [\App\Http\Controllers\ChatbotController::class, 'analyzeQuiz'])
+    ->middleware('auth');
 
 
 require __DIR__.'/auth.php';

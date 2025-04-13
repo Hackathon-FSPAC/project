@@ -19,6 +19,8 @@
             showAnswer: false,
             questions: [],
             loading: true,
+            userAnswers: [],
+            feedback: null,
 
             init() {
                 this.loadQuestionsFromAI();
@@ -74,6 +76,7 @@ Răspunsurile trebuie să fie clare, educative, relevante pentru tineri (16-25 a
             selectAnswer(index) {
                 this.selectedAnswer = index;
                 this.showAnswer = true;
+                this.userAnswers.push(index);
                 if (index === this.questions[this.currentQuestion].correct) {
                     this.score++;
                 }
@@ -83,6 +86,9 @@ Răspunsurile trebuie să fie clare, educative, relevante pentru tineri (16-25 a
                 this.currentQuestion++;
                 this.selectedAnswer = null;
                 this.showAnswer = false;
+                if (this.currentQuestion === this.questions.length - 1) {
+                this.getAnalysis(); // chemăm AI-ul!
+                }   
             },
 
             getFeedback() {
@@ -98,7 +104,7 @@ Răspunsurile trebuie să fie clare, educative, relevante pentru tineri (16-25 a
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     },
-                    body: JSON.stringify({ score: this.score })
+                    body: JSON.stringify({ score: parseInt(this.score) })
                 })
                 .then(res => res.json())
                 .then(() => {
@@ -110,6 +116,33 @@ Răspunsurile trebuie să fie clare, educative, relevante pentru tineri (16-25 a
                     alert('Eroare la partajare.');
                 });
             }
+            getAnalysis() {
+                fetch('/quiz/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        score: this.score,
+                        answers: this.questions.map((q, index) => ({
+                            text: q.text,
+                            options: q.options,
+                            correct: q.correct,
+                            selected: index < this.currentQuestion ? this.userAnswers[index] : null
+                        }))
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    this.feedback = data.feedback;
+                })
+                .catch(err => {
+                    console.error(err);
+                    this.feedback = 'Eroare la generarea feedback-ului.';
+                });
+}
+
         }
     }
 </script>
