@@ -8,6 +8,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\ChatbotController;
 use Illuminate\Http\Request;
+use App\Models\Expense;
+use App\Http\Controllers\ExpenseController;
 
 Route::get('/', function () {
     $feed = FeedItem::with('user')->latest()->get();
@@ -87,4 +89,12 @@ Route::post('/logout', function (Request $request) {
     $request->session()->regenerateToken();
     return redirect('/');
 })->name('logout');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/expenses', [ExpenseController::class, 'expenses'])->name('expenses.expenses');
+    Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
+    Route::get('/expenses/{id}/edit', [ExpenseController::class, 'edit'])->name('expenses.edit');
+    Route::put('/expenses/{id}', [ExpenseController::class, 'update'])->name('expenses.update');
+    Route::delete('/expenses/{id}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
+});
 require __DIR__.'/auth.php';

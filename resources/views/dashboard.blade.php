@@ -11,6 +11,7 @@
                 <li><a href="{{ route('dashboard') }}" class="text-blue-600 hover:underline">📊 Feed</a></li>
                 <li><a href="{{ route('quiz.show') }}" class="text-blue-600 hover:underline">🧠 Daily Financial Quiz</a></li>
                 <li><a href="{{ route('profile') }}" class="text-blue-600 hover:underline">👤 Profile</a></li>
+                <li><a href="{{ route('expenses.expenses') }}" class="text-blue-600 hover:underline">💸 Your Expenses</a></li>
                 <li><a href="#" class="text-blue-600 hover:underline">⚙️ Settings</a></li>
             </ul>
         </div>
