@@ -130,7 +130,8 @@ class ChatbotController extends Controller
                     'role' => 'model',
                     'parts' => [
                         [
-                            'text' => "You are a financial assistant. Always respond with a focus on financial literacy, economics, budgeting, investments, or financial planning unless otherwise asked. Be accurate and use professional finance terminology when appropriate."
+                            'text' => "You are a financial assistant. Always respond with a focus on financial literacy, economics, budgeting, investments, or financial planning unless otherwise asked. Be accurate and clear. Avoid using Markdown formatting or special characters like ** for bold. Write responses using plain text, paragraphs and - lines."
+
                         ]
                     ]
                 ]
@@ -215,38 +216,75 @@ class ChatbotController extends Controller
     }
 
     public function generateQuizQuestions(Request $request)
-{
-    try {
-        $prompt = $request->input('message');
+    {
+        try {
+            $prompt = $request->input('message');
 
-        if (empty(trim($prompt))) {
-            return response()->json(['reply' => 'Mesajul este gol.']);
+            if (empty(trim($prompt))) {
+                return response()->json(['reply' => 'Mesajul este gol.']);
+            }
+
+            $apiKey = env('GEMINI_API_KEY');
+            $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . $apiKey;
+
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+            ])->post($url, [
+                'contents' => [
+                    [
+                        'role' => 'user',
+                        'parts' => [['text' => $prompt]]
+                    ]
+                ]
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                $reply = $data['candidates'][0]['content']['parts'][0]['text'] ?? "Eroare: răspuns gol.";
+                return response()->json(['reply' => $reply]);
+            }
+
+            return response()->json(['reply' => 'Eroare de la Gemini: ' . ($response->json()['error']['message'] ?? 'Necunoscută')]);
+
+        } catch (\Exception $e) {
+            return response()->json(['reply' => 'Eroare server: ' . $e->getMessage()]);
+        }
+    }
+
+    public function analyzeQuiz(Request $request)
+    {
+        $message = $request->input('message');
+
+        if (!$message || strlen($message) < 10) {
+            return response()->json(['reply' => 'Datele transmise nu sunt valide.'], 422);
         }
 
         $apiKey = env('GEMINI_API_KEY');
         $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . $apiKey;
 
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-        ])->post($url, [
-            'contents' => [
-                [
-                    'role' => 'user',
-                    'parts' => [['text' => $prompt]]
+        try {
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+            ])->post($url, [
+                'contents' => [
+                    [
+                        'role' => 'user',
+                        'parts' => [['text' => $message]]
+                    ]
                 ]
-            ]
-        ]);
+            ]);
 
-        if ($response->successful()) {
-            $data = $response->json();
-            $reply = $data['candidates'][0]['content']['parts'][0]['text'] ?? "Eroare: răspuns gol.";
-            return response()->json(['reply' => $reply]);
+            if ($response->successful()) {
+                $data = $response->json();
+                $reply = $data['candidates'][0]['content']['parts'][0]['text'] ?? 'Fără recomandări.';
+                return response()->json(['reply' => $reply]);
+            }
+
+            return response()->json(['reply' => 'Eroare AI: ' . $response->body()], 500);
+        } catch (\Exception $e) {
+            return response()->json(['reply' => 'Eroare server: ' . $e->getMessage()], 500);
         }
-
-        return response()->json(['reply' => 'Eroare de la Gemini: ' . ($response->json()['error']['message'] ?? 'Necunoscută')]);
-
-    } catch (\Exception $e) {
-        return response()->json(['reply' => 'Eroare server: ' . $e->getMessage()]);
     }
-}
+
+
 }

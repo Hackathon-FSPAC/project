@@ -15,14 +15,6 @@ class QuizController extends Controller
     $today = \Carbon\Carbon::today();
     $user = \Auth::user();
 
-    $already = \App\Models\QuizResult::where('user_id', $user->id)
-        ->whereDate('completed_at', $today)
-        ->first();
-
-    if ($already) {
-        return view('quiz.already_done', ['score' => $already->score]);
-    }
-
     return view('quiz.start');
 }
 
@@ -30,16 +22,7 @@ class QuizController extends Controller
 {
     $today = Carbon::today();
     $userId = Auth::id();
-
-    // ❗ Verifică dacă deja există un quiz azi
-    $alreadyDone = QuizResult::where('user_id', $userId)
-        ->whereDate('completed_at', $today)
-        ->first();
-
-    if ($alreadyDone) {
-        return redirect()->route('quiz.show')->with('error', 'Ai completat deja quiz-ul azi.');
-    }
-
+    
     // ✅ Calculează scorul și salvează
     $request->validate([
         'score' => 'required|integer|min:0|max:10',
