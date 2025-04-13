@@ -213,4 +213,40 @@ class ChatbotController extends Controller
 
         return response()->json(['status' => 'error'], 401);
     }
+
+    public function generateQuizQuestions(Request $request)
+{
+    try {
+        $prompt = $request->input('message');
+
+        if (empty(trim($prompt))) {
+            return response()->json(['reply' => 'Mesajul este gol.']);
+        }
+
+        $apiKey = env('GEMINI_API_KEY');
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . $apiKey;
+
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+        ])->post($url, [
+            'contents' => [
+                [
+                    'role' => 'user',
+                    'parts' => [['text' => $prompt]]
+                ]
+            ]
+        ]);
+
+        if ($response->successful()) {
+            $data = $response->json();
+            $reply = $data['candidates'][0]['content']['parts'][0]['text'] ?? "Eroare: răspuns gol.";
+            return response()->json(['reply' => $reply]);
+        }
+
+        return response()->json(['reply' => 'Eroare de la Gemini: ' . ($response->json()['error']['message'] ?? 'Necunoscută')]);
+
+    } catch (\Exception $e) {
+        return response()->json(['reply' => 'Eroare server: ' . $e->getMessage()]);
+    }
+}
 }

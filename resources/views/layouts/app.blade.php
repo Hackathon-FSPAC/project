@@ -25,7 +25,7 @@
             },
 
             loadQuestionsFromAI() {
-                fetch('/chatbot/talk', {
+                fetch('/quiz/generate', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

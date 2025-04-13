@@ -68,4 +68,7 @@ Route::post('/quiz/share', function (\Illuminate\Http\Request $request) {
     return response()->json(['status' => 'ok']);
 })->middleware('auth');
 
+Route::post('/quiz/generate', [ChatbotController::class, 'generateQuizQuestions'])->middleware('auth');
+
+
 require __DIR__.'/auth.php';
