@@ -10,6 +10,7 @@ use App\Http\Controllers\ChatbotController;
 use Illuminate\Http\Request;
 use App\Models\Expense;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\PrivateMessageController;
 
 Route::get('/', function () {
     $feed = FeedItem::with('user')->latest()->get();
@@ -96,5 +97,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/expenses/{id}/edit', [ExpenseController::class, 'edit'])->name('expenses.edit');
     Route::put('/expenses/{id}', [ExpenseController::class, 'update'])->name('expenses.update');
     Route::delete('/expenses/{id}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/private-messages', [PrivateMessageController::class, 'index'])->name('private-messages.index');
+    Route::get('/private-messages/{user}', [PrivateMessageController::class, 'show'])->name('private-messages.show');
+    Route::post('/private-messages/{user}', [PrivateMessageController::class, 'store'])->name('private-messages.store');
 });
 require __DIR__.'/auth.php';

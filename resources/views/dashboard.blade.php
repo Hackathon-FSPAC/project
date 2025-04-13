@@ -1,6 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    .message-btn {
+        transition: all 0.2s;
+    }
+    .message-btn:hover {
+        transform: translateY(-1px);
+    }
+</style>
 <div x-data="{ collapsed: false }" class="flex min-h-screen">
 
     {{-- PANOU LATERAL --}}
@@ -13,6 +22,7 @@
                 <li><a href="{{ route('profile') }}" class="text-blue-600 hover:underline">👤 Profile</a></li>
                 <li><a href="{{ route('expenses.expenses') }}" class="text-blue-600 hover:underline">💸 Your Expenses</a></li>
                 <li><a href="#" class="text-blue-600 hover:underline">⚙️ Settings</a></li>
+                <li><a href="{{ route('private-messages.index') }}" class="text-blue-600 hover:underline"><i class="fas fa-envelope"></i>💬 Messages</a></li>
             </ul>
         </div>
     </div>
@@ -45,12 +55,23 @@
             {{-- FEED --}}
             @foreach ($feed as $item)
             <div class="bg-white rounded-xl shadow p-5 mb-5">
-                <div class="flex items-center space-x-3 mb-2">
-                    <img src="{{ $item->user->profile_photo ? asset('storage/' . $item->user->profile_photo) : 'https://ui-avatars.com/api/?name=' . urlencode($item->user->name) }}" class="w-8 h-8 rounded-full">
-                    <div class="text-sm text-gray-700 font-semibold">
-                        {{ $item->user->name }}
-                        <span class="text-gray-400 font-normal text-xs">· {{ $item->created_at->diffForHumans() }}</span>
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-3">
+                        <img src="{{ $item->user->profile_photo ? asset('storage/' . $item->user->profile_photo) : 'https://ui-avatars.com/api/?name=' . urlencode($item->user->name) }}" class="w-8 h-8 rounded-full">
+                        <div class="text-sm text-gray-700 font-semibold">
+                            {{ $item->user->name }}
+                            <span class="text-gray-400 font-normal text-xs">· {{ $item->created_at->diffForHumans() }}</span>
+                        </div>
                     </div>
+                    
+                    {{-- Butonul pentru mesaj privat --}}
+                    @if($item->user->id !== Auth::id())
+                    <a href="{{ route('private-messages.show', $item->user) }}" 
+                    class="text-gray-400 hover:text-blue-500 text-sm"
+                    title="Send private message">
+                        <i class="fas fa-paper-plane"></i>
+                    </a>
+                    @endif
                 </div>
 
                 <p class="text-gray-800 whitespace-pre-line">{{ $item->content }}</p>

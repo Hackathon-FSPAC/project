@@ -52,4 +52,15 @@ class User extends Authenticatable
             ? asset('storage/' . $this->profile_photo_path)
             : 'https://ui-avatars.com/api/?name=' . urlencode($this->name);
     }
+
+    public function privateConversations()
+    {
+        return $this->hasMany(PrivateConversation::class, 'user1_id')
+                ->orWhere('user2_id', $this->id);
+    }
+
+    public function privateMessages()
+    {
+        return $this->hasMany(PrivateMessage::class, 'sender_id');
+    }
 }
