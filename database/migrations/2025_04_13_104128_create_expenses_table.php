@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up()
     {
+        if(!Schema::hasTable("expenses")){
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -19,6 +20,7 @@ return new class extends Migration
             $table->decimal('amount', 10, 2); // positive or negative
             $table->timestamps();
         });
+        }
     }
 
     /**

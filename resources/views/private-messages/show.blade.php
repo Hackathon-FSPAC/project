@@ -1,147 +1,78 @@
-@extends('layouts.app')
+@extends('layouts.panel')
 
 @section('content')
-<div class="container-fluid py-4">
-    <div class="row g-4">
-        <!-- Chat principal -->
-        <div class="col-lg-8">
-            <div class="card shadow rounded-4">
-                <div class="card-header bg-white d-flex align-items-center py-3 border-0">
-                    <div class="avatar me-3">
-                        <img src="{{ $otherUser->profile_photo_url }}" alt="{{ $otherUser->name }}" class="rounded-circle" width="48" height="48">
-                    </div>
-                    <div>
-                        <h5 class="mb-0">Conversație cu {{ $otherUser->name }}</h5>
-                        <small class="text-muted">
-                            @if($messages->count() > 0)
-                                Ultimul mesaj: {{ $messages->first()->created_at->diffForHumans() }}
-                            @else
-                                Nu există mesaje
-                            @endif
-                        </small>
-                    </div>
-                </div>
+<div class="max-w-5xl mx-auto py-10 px-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                <div class="card-body p-0">
-                    <div class="chat-messages px-4 py-3" style="max-height: calc(100vh - 300px); overflow-y: auto;">
-                        @forelse($messages->reverse() as $message)
-                            <div class="chat-message @if($message->sender_id == Auth::id()) outgoing @else incoming @endif mb-3">
-                                <div class="message-bubble @if($message->sender_id == Auth::id()) bg-primary text-white @else bg-light @endif">
-                                    <div class="message-content">
-                                        {{ $message->content }}
-                                    </div>
-                                    <div class="message-time text-end small @if($message->sender_id == Auth::id()) text-white-50 @else text-muted @endif">
-                                        {{ $message->created_at->format('H:i') }}
-                                        @if($message->sender_id == Auth::id())
-                                            @if($message->read)
-                                                <i class="fas fa-check-double ms-1"></i>
-                                            @else
-                                                <i class="fas fa-check ms-1"></i>
-                                            @endif
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="text-center py-5 text-muted">
-                                Nu există mesaje în această conversație. Trimite primul mesaj!
-                            </div>
-                        @endforelse
-                    </div>
-                </div>
-
-                <div class="card-footer bg-white py-3 border-0">
-                    <form action="{{ route('private-messages.store', $otherUser) }}" method="POST" class="message-form">
-                        @csrf
-                        <div class="input-group">
-                            <input type="text" name="content" class="form-control border-0 py-3" placeholder="Scrie un mesaj..." required>
-                            <button class="btn btn-primary px-4" type="submit">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
-                        </div>
-                    </form>
-                </div>
+    {{-- Chat principal --}}
+    <div class="lg:col-span-2 bg-white shadow rounded-2xl overflow-hidden flex flex-col">
+        <div class="flex items-center gap-4 p-4 border-b">
+            <img src="{{ $otherUser->profile_photo_url }}" alt="{{ $otherUser->name }}" class="w-12 h-12 rounded-full object-cover">
+            <div>
+                <h2 class="font-semibold text-lg">Conversație cu {{ $otherUser->name }}</h2>
+                <p class="text-sm text-gray-500">
+                    @if($messages->count() > 0)
+                        Ultimul mesaj: {{ $messages->first()->created_at->diffForHumans() }}
+                    @else
+                        Nu există mesaje
+                    @endif
+                </p>
             </div>
         </div>
 
-        <!-- Detalii utilizator -->
-        <div class="col-lg-4">
-            <div class="card shadow rounded-4">
-                <div class="card-header bg-white py-3 border-0">
-                    <h5 class="mb-0">Detalii utilizator</h5>
-                </div>
-                <div class="card-body text-center">
-                    <div class="avatar mb-3">
-                        <img src="{{ $otherUser->profile_photo_url }}" alt="{{ $otherUser->name }}" class="rounded-circle shadow" width="100" height="100">
+        <div class="flex-1 overflow-y-auto p-4 space-y-4" id="chat-scroll">
+            @forelse($messages->reverse() as $message)
+                <div class="flex {{ $message->sender_id === Auth::id() ? 'justify-end' : 'justify-start' }}">
+                    <div class="max-w-xs md:max-w-md px-4 py-2 rounded-xl shadow
+                        {{ $message->sender_id === Auth::id() ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900' }}">
+                        <p>{{ $message->content }}</p>
+                        <div class="text-xs mt-1 text-right {{ $message->sender_id === Auth::id() ? 'text-blue-200' : 'text-gray-500' }}">
+                            {{ $message->created_at->format('H:i') }}
+                            @if($message->sender_id == Auth::id())
+                                @if($message->read)
+                                    <i class="fas fa-check-double ms-1"></i>
+                                @else
+                                    <i class="fas fa-check ms-1"></i>
+                                @endif
+                            @endif
+                        </div>
                     </div>
-                    <h4>{{ $otherUser->name }}</h4>
-                    <p class="text-muted">{{ $otherUser->email }}</p>
-                    <div class="d-flex justify-content-center mt-3">
-                        <button class="btn btn-outline-secondary btn-sm">
-                            <i class="fas fa-ellipsis-h"></i>
-                        </button>
-                    </div>
                 </div>
+            @empty
+                <div class="text-center text-gray-500 py-10">
+                    Nu există mesaje în această conversație. Trimite primul mesaj! ✉️
+                </div>
+            @endforelse
+        </div>
+
+        <form action="{{ route('private-messages.store', $otherUser) }}" method="POST" class="border-t p-4">
+            @csrf
+            <div class="flex gap-3">
+                <input type="text" name="content" placeholder="Scrie un mesaj..." required
+                    class="flex-1 border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button type="submit" class="bg-blue-600 text-white px-5 py-3 rounded-xl hover:bg-blue-700 transition">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
             </div>
+        </form>
+    </div>
+
+    {{-- Detalii utilizator --}}
+    <div class="bg-white shadow rounded-2xl p-6 text-center">
+        <img src="{{ $otherUser->profile_photo_url }}" alt="{{ $otherUser->name }}"
+             class="w-24 h-24 rounded-full mx-auto mb-4 shadow object-cover">
+        <h3 class="text-xl font-semibold">{{ $otherUser->name }}</h3>
+        <p class="text-gray-500">{{ $otherUser->email }}</p>
+        <div class="mt-4">
+            <button class="text-gray-600 hover:text-gray-800">
+                <i class="fas fa-ellipsis-h"></i>
+            </button>
         </div>
     </div>
 </div>
 
-<style>
-    .chat-messages {
-        scroll-behavior: smooth;
-    }
-
-    .message-bubble {
-        border-radius: 1rem;
-        padding: 12px 16px;
-        max-width: 80%;
-        position: relative;
-        word-wrap: break-word;
-    }
-
-    .incoming .message-bubble {
-        background-color: #f1f3f5;
-        border-bottom-left-radius: 0.5rem;
-    }
-
-    .outgoing .message-bubble {
-        background-color: #0d6efd;
-        border-bottom-right-radius: 0.5rem;
-        margin-left: auto;
-    }
-
-    .message-time {
-        font-size: 0.75rem;
-        margin-top: 4px;
-    }
-
-    .avatar img {
-        object-fit: cover;
-    }
-
-    .message-form .form-control:focus {
-        box-shadow: none;
-    }
-
-    @media (max-width: 768px) {
-        .chat-messages {
-            padding: 1rem !important;
-        }
-
-        .card-header h5 {
-            font-size: 1.1rem;
-        }
-
-        .message-bubble {
-            max-width: 100%;
-        }
-    }
-</style>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const chatContainer = document.querySelector('.chat-messages');
+    document.addEventListener('DOMContentLoaded', () => {
+        const chatContainer = document.getElementById('chat-scroll');
         chatContainer.scrollTop = chatContainer.scrollHeight;
     });
 </script>
